@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildPrompt } from "@/lib/prompt-builder";
 import { getReplicateClient, isReplicateConfigured } from "@/lib/replicate";
 
-// モック画像URLs (Unsplash architectural images)
+// モック画像URLs
 const MOCK_IMAGES = [
   "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80",
   "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { imageUrl, wallId, floorId, exteriorId, roomType, style, customNote, projectId, blueprintId } = body;
+    const { imageUrl, wallId, floorId, exteriorId, roomType, style, customNote } = body;
 
     const prompt = buildPrompt({ wallId, floorId, exteriorId, roomType, style, customNote });
 
@@ -25,25 +25,31 @@ export async function POST(req: NextRequest) {
 
     if (isReplicateConfigured()) {
       const replicate = getReplicateClient()!;
+
+      // adirik/interior-design: インテリアデザイン専用モデル
+      // 元の部屋の構造（壁・窓・間取り）を保持しつつ素材・スタイルを変換
       const output = await replicate.run(
-        "jagilley/controlnet-hough:854e8727697a057c525cdb45ab037f64ecca770a1769cc52287c2e56c5c572c",
+        "adirik/interior-design:76604baddc85b1b4616e1c6475571571f33e532a948b8e25fa3c5eac59055508",
         {
           input: {
             image: imageUrl,
             prompt: prompt,
-            num_samples: "1",
-            image_resolution: "768",
-            ddim_steps: 30,
-            scale: 9,
-            a_prompt: "best quality, extremely detailed, photorealistic, architectural photography",
-            n_prompt: "longbody, lowres, bad anatomy, bad hands, missing fingers, blurry, watermark, text, cartoon, anime, illustration"
-          }
+            guidance_scale: 15,
+            negative_prompt: "lowres, blurry, watermark, text, cartoon, anime, illustration, distorted, deformed",
+            prompt_strength: 0.8,
+            num_inference_steps: 50,
+          },
         }
       );
-      generatedImageUrl = Array.isArray(output) ? String(output[1] || output[0]) : String(output);
+
+      if (Array.isArray(output) && output.length > 0) {
+        generatedImageUrl = String(output[0]);
+      } else {
+        generatedImageUrl = String(output);
+      }
     } else {
-      // デモモード: ランダムなモック画像を返却
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 擬似的な待機
+      // デモモード
+      await new Promise(resolve => setTimeout(resolve, 2000));
       generatedImageUrl = MOCK_IMAGES[Math.floor(Math.random() * MOCK_IMAGES.length)];
     }
 
