@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       // 元の部屋の構造（壁・窓・間取り）を保持しつつ素材・スタイルを変換
       // バージョン指定なし = 最新版を自動使用
       const output = await replicate.run(
-        "adirik/interior-design" as `${string}/${string}`,
+        "adirik/interior-design:76604baddc85b1b4616e1c6475eca080da339c8875bd4996705440484a6eac38",
         {
           input: {
             image: imageUrl,

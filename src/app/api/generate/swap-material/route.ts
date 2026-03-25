@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       // img2img: 元画像をベースに素材だけ変更
       // adirik/interior-designで構造維持しつつ素材変更
       const output = await replicate.run(
-        "adirik/interior-design" as `${string}/${string}`,
+        "adirik/interior-design:76604baddc85b1b4616e1c6475eca080da339c8875bd4996705440484a6eac38",
         {
           input: {
             image: baseImageUrl,
