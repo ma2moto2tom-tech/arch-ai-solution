@@ -110,7 +110,7 @@ export default function GeneratePage() {
       if (!data.success) throw new Error(data.error || "生成に失敗しました");
 
       setResult({
-        beforeImage: uploadedPreview,
+        beforeImage: uploadedPreview!,
         afterImage: data.generatedImageUrl,
         demoMode: data.demoMode,
         wallId: selectedWall!,

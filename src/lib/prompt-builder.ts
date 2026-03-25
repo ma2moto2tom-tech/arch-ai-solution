@@ -20,6 +20,8 @@ export function buildPrompt(input: GeneratePromptInput): string {
     bedroom: "comfortable bedroom",
     bathroom: "clean bathroom",
     exterior: "residential exterior",
+    office: "professional office space",
+    japanese_room: "traditional Japanese room with tokonoma alcove",
   };
 
   const styleLabel: Record<string, string> = {
@@ -27,6 +29,8 @@ export function buildPrompt(input: GeneratePromptInput): string {
     modern: "modern minimalist design",
     japanese_modern: "Japanese modern interior design with wa-modern aesthetics",
     natural: "natural and organic interior with warm lighting",
+    industrial: "industrial loft design with exposed elements",
+    scandinavian: "Scandinavian minimalist design with light wood and white tones",
   };
 
   const room = roomLabel[input.roomType || "living"] || "spacious living room";
